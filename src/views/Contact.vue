@@ -3,8 +3,8 @@
     <van-nav-bar class="header">
       <template #left>
         <img
-          style="width:38px;height:38px;border-radius:50%"
-          src="https://edw4rd.cn/assets/avatar.jpg"
+          style="width:42px;height:42px;border-radius:50%"
+          :src="avatar"
           alt=""
         >
         <div class="flex ">
@@ -43,12 +43,13 @@
           <div class="onlines">
             <div
               class="item"
+              @click="() => handleChat(user)"
               v-for="(user,idx) of onlineUsers"
               :key="idx"
             >
               <img
                 class="left"
-                src="https://edw4rd.cn/assets/avatar.jpg"
+                :src="avatar"
                 alt=""
               >
               <div class="right">
@@ -74,16 +75,24 @@
         <van-tab title="订阅号">设备</van-tab>
       </van-tabs>
     </div>
+     <van-tabbar v-model="active2" route>
+      <van-tabbar-item to="/message" icon="chat-o">消息</van-tabbar-item>
+      <van-tabbar-item to="/contact" icon="user-circle-o">联系人</van-tabbar-item>
+      <van-tabbar-item to="/dynamic" icon="new-o">动态</van-tabbar-item>
+    </van-tabbar>
   </div>
 </template>
 
 <script>
+import avatar from '@/assets/avatar.jpg'
 import { mapGetters } from 'vuex'
 import { Toast } from 'vant'
 export default {
   data () {
     return {
       active: 0,
+      active2: 0,
+      avatar,
       list: new Array(20).fill(true),
       showPopover: false,
       actions: [
@@ -100,6 +109,14 @@ export default {
     console.error(this.onlineUsers)
   },
   methods: {
+    handleChat (item) {
+      this.$router.push({
+        name: 'chat',
+        params: {
+          id: item
+        }
+      })
+    },
     onSelect (action) {
       Toast(action.text)
     }

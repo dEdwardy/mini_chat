@@ -23,6 +23,11 @@ const routes = [
     path: '/dynamic',
     name: 'dynamic',
     component: () => import(/* webpackChunkName: "dynamic" */ '../views/Dynamic.vue')
+  },
+  {
+    path: '/chat/:id',
+    name: 'chat',
+    component: () => import(/* webpackChunkName: "chat" */ '../views/Chat.vue')
   }
 ]
 

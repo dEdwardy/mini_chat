@@ -3,11 +3,6 @@
     <main class="main">
       <router-view />
     </main>
-    <van-tabbar v-model="active" route>
-      <van-tabbar-item to="/message" icon="chat-o">消息</van-tabbar-item>
-      <van-tabbar-item to="/contact" icon="user-circle-o">联系人</van-tabbar-item>
-      <van-tabbar-item to="/dynamic" icon="new-o">动态</van-tabbar-item>
-    </van-tabbar>
   </div>
   <Home v-else />
 </template>
@@ -71,7 +66,7 @@ export default {
     padding:0 16px;
   }
   .main{
-    height: calc(100vh - 100px);
+    // height: calc(100vh - 100px);
     overflow-y: scroll;
   }
 }
