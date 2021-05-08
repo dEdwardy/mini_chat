@@ -29,7 +29,7 @@ export default {
     }
   },
   mounted () {
-    this.socket = io.connect('http://localhost:3000', {
+    this.socket = io.connect('http://192.168.79.228:3000', {
       query: {
         token: 'tokenxxxxxxxxxxxxxxxxxxxxxxxxx'
       }
@@ -50,6 +50,10 @@ export default {
     })
     this.socket.on('message', msg => {
       console.error(msg)
+    })
+    this.socket.on('chat', msg => {
+      console.error('chat', msg)
+      this.$store.commit('handleMessage', msg)
     })
   },
   methods: {

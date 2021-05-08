@@ -1,5 +1,5 @@
 import 'vant/lib/index.css'
-import { Row, Col, List, Tabbar, TabbarItem, Tabs, Tab, Sticky, NavBar, Icon, Popover } from 'vant'
+import { Row, Col, List, Tabbar, TabbarItem, Tabs, Tab, Sticky, NavBar, Icon, Popover, Field, Button, Badge } from 'vant'
 import Vue from 'vue'
 
 Vue.use(Row)
@@ -13,3 +13,6 @@ Vue.use(Row)
   .use(NavBar)
   .use(Icon)
   .use(Popover)
+  .use(Field)
+  .use(Button)
+  .use(Badge)

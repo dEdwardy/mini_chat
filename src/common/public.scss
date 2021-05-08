@@ -1,3 +1,65 @@
 .linear-bg{
   background: linear-gradient(120deg, rgba(blue, 0.2), rgba(blue, 0.5));
 }
+/* flex 布局 */
+.flex {
+	display: flex;
+	flex-direction: row;
+}
+.flex-row {
+	flex-direction: row !important;
+}
+.flex-column {
+	flex-direction: column !important;
+}
+.flex-row-reverse {
+	flex-direction: row-reverse !important;
+}
+.flex-column-reverse {
+	flex-direction: column-reverse !important;
+}
+.flex-wrap {
+	flex-wrap: wrap;
+}
+.flex-nowrap {
+	flex-wrap: nowrap;
+}
+.justify-start {
+	justify-content: flex-start!important;
+}
+.justify-around {
+	justify-content: space-around;
+}
+.justify-end {
+	justify-content: flex-end!important;
+}
+.justify-between {
+	justify-content: space-between!important;
+}
+.justify-center {
+	justify-content: center;
+}
+.align-center {
+	align-items: center;
+}
+.align-stretch {
+	align-items: stretch;
+}
+.align-start {
+	align-items: flex-start;
+}
+.align-end {
+	align-items: flex-end;
+}
+.px-1{
+  padding: 0 5px;
+}
+.px-2{
+  padding:0 10px;
+}
+.py-1{
+  padding:5px 0;
+}
+.py-2{
+  padding:10px 0;
+}
