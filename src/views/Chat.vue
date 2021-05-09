@@ -28,15 +28,37 @@
         />
       </template>
     </van-nav-bar>
-    <div class="chat-records">
-      <div class="flex px-2 align-center py-1" :class="item.from == username ? 'me' :'other' " v-for="(item,index) of records" :key="index">
-        <img :src="avatar" style="width:36px;height:36px;border-radius:50%;margin:0 12px">
-        <div >
-          <div class="flex " :class="item.from == username ? 'justify-end' :'' ">
+    <div
+      class="chat-records"
+      :style="{ height: showTools ? 'calc(100vh - 80px - 46px - 200px)' :'calc(100vh - 80px - 46px)' }"
+    >
+      <div
+        class="flex px-2 align-center py-1"
+        :class="item.from == username ? 'me' :'other' "
+        v-for="(item,index) of records"
+        :key="index"
+      >
+        <img
+          :src="avatar"
+          style="width:36px;height:36px;border-radius:50%;margin:0 12px"
+        >
+        <div>
+          <div
+            class="flex "
+            :class="item.from == username ? 'justify-end' :'' "
+          >
             {{item.from}}
           </div>
-          <div class="msg">
-          {{ item.msg }}
+          <!-- text消息 -->
+          <div
+            v-if="item.type=='text'"
+            class="msg"
+          >
+            {{ item.msg }}
+          </div>
+          <!-- 语音消息 -->
+          <div style="margin-top:12px" v-else-if="item.type == 'audio'">
+            <m-audio v-if="item.src" :showDuration="false" :block="false" :src="item.src"></m-audio>
           </div>
         </div>
       </div>
@@ -49,7 +71,7 @@
           clearable
         />
         <van-button
-          @click="handleSendMsg"
+          @click.stop="handleSendMsg"
           :disabled="!msg"
           type="info"
           size="small"
@@ -58,6 +80,7 @@
       </div>
       <div class="tools flex align-center justify-between px-2">
         <van-icon
+          @click.stop="showAudioInput"
           class="flex-1"
           :size="24"
           name="phone-circle-o"
@@ -89,21 +112,37 @@
         />
       </div>
     </div>
+    <div
+      class="toolBox"
+      v-clickoutside="handleClickout"
+      v-if="showTools"
+      style="height:200px"
+    >
+      <vue-record-audio
+        class="audio"
+        mode="hold"
+        @result="onResult"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import avatar from '@/assets/avatar.jpg'
+import Clickoutside from '@/utils/clickoutside'
 export default {
   inject: ['app'],
+  directives: { Clickoutside },
   data () {
     return {
       avatar,
       // 发送的消息
       msg: '',
       // 我的发言
-      mine: []
+      mine: [],
+      showTools: false,
+      context: null
     }
   },
   computed: {
@@ -113,22 +152,67 @@ export default {
     //   return
     // }
     records () {
+      console.error('computed ...................................')
       const from = this.messages.filter(i => i.from === this.$route.params.id)
       const send = this.messages_send.filter(i => i.to === this.$route.params.id)
-      return [...send, ...from].sort((pre, cur) => pre.time - cur.time)
+      return [...send, ...from].sort((pre, cur) => pre.time - cur.time).map(i => {
+        if (i.type === 'audio') {
+          return {
+            ...i,
+            src: window.URL.createObjectURL(new Blob([i.msg]))
+          }
+        } else {
+          return i
+        }
+      })
     }
   },
   methods: {
+    // getAudioSrc (arrayBuffer) {
+    //   const res = window.URL.createObjectURL(new Blob([arrayBuffer]))
+    //   console.error(res)
+    //   return res
+    // },
+    async onResult (blob) {
+      // const arrayBuffer = await this.readBlob(blob)
+      const data = {
+        from: this.username,
+        to: this.$route.params.id,
+        msg: blob,
+        type: 'audio',
+        time: Date.now()
+      }
+      this.$store.commit('handleSendMessage', data)
+      this.app.socket.emit('chat', data)
+      console.log(blob)
+    },
+    readBlob (blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          resolve(reader.result)
+        }
+        reader.onerror = err => reject(err)
+        reader.readAsArrayBuffer(blob)
+      })
+    },
+    handleClickout () {
+      this.showTools = false
+    },
     handleSendMsg () {
       const data = {
         from: this.username,
         to: this.$route.params.id,
+        type: 'text',
         msg: this.msg,
         time: Date.now()
       }
       this.app.socket.emit('chat', data)
       this.$store.commit('handleSendMessage', data)
       this.msg = ''
+    },
+    showAudioInput () {
+      this.showTools = !this.showTools
     }
   }
 }
@@ -138,43 +222,44 @@ export default {
 .chat {
   background-color: #ecedf1;
   .chat-records {
-    height: calc(100vh - 80px - 46px);
+    // height: calc(100vh - 80px - 46px);
+    transition: all 0.2s linear;
     overflow-x: scroll;
-    .me{
+    .me {
       flex-direction: row-reverse;
-      .msg{
+      .msg {
         background-color: rgba(52, 178, 253, 1);
-        color:#fff;
-        &::after{
-          position:absolute;
-          right:0;
+        color: #fff;
+        &::after {
+          position: absolute;
+          right: 0;
           content: '';
-          width:4px;
+          width: 4px;
           height: 4px;
-          color:transparent;
+          color: transparent;
           background-color: rgba(52, 178, 253, 1);
         }
       }
     }
-    .other{
+    .other {
       flex-direction: row;
-      .msg{
+      .msg {
         background-color: #fff;
         color: rgba(80, 80, 80, 1);
-        &::before{
-          position:absolute;
-          color:transparent;
-          left:0;
+        &::before {
+          position: absolute;
+          color: transparent;
+          left: 0;
           content: '';
-          width:4px;
+          width: 4px;
           height: 4px;
           background-color: #fff;
         }
       }
     }
-    .msg{
-      position:relative;
-      padding:5px 16px;
+    .msg {
+      position: relative;
+      padding: 5px 16px;
       border-radius: 16px;
       font-size: 14px;
     }
@@ -193,6 +278,14 @@ export default {
   .tools {
     height: 44px;
     line-height: 44px;
+  }
+  .toolBox {
+    position: relative;
+    background: #fff;
+    transition: all 0.2s linear;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 </style>

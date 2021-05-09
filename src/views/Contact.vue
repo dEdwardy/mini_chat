@@ -1,6 +1,6 @@
 <template>
   <div class="contact">
-    <van-nav-bar class="header">
+    <van-nav-bar class="header" safe-area-inset-top>
       <template #left>
         <img
           style="width:42px;height:42px;border-radius:50%"

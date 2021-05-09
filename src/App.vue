@@ -1,5 +1,8 @@
 <template>
-  <div id="app" v-if="username">
+  <div
+    id="app"
+    v-if="username"
+  >
     <main class="main">
       <router-view />
     </main>
@@ -29,14 +32,21 @@ export default {
     }
   },
   mounted () {
-    this.socket = io.connect('http://192.168.79.228:3000', {
+    window.addEventListener('beforeunload', this.handleUnload)
+    const username = localStorage.getItem('username')
+    const prod = 'http://47.112.172.255:3000'
+    const dev = 'http://localhost:3000'
+    const production = process.env.production
+    this.socket = io.connect(production ? prod : dev, {
+      transports: ['websocket'],
       query: {
         token: 'tokenxxxxxxxxxxxxxxxxxxxxxxxxx'
       }
     })
 
-    if (localStorage.getItem('username')) {
+    if (username) {
       console.error('111111111')
+      this.socket.emit('login', username)
       this.socket.emit('online_users')
       localStorage.removeItem('username')
     }
@@ -56,20 +66,30 @@ export default {
       this.$store.commit('handleMessage', msg)
     })
   },
+  beforeDestroy () {
+    this.handleUnload()
+    window.removeEventListener('beforeunload', this.handleUnload)
+  },
   methods: {
+    handleUnload () {
+      const username = localStorage.getItem('username')
+      if (username) {
+        this.socket.emit('logout', username)
+      }
+    }
   }
 
 }
 </script>
 
 <style lang="scss">
-#app{
-  .header{
+#app {
+  .header {
     height: 50px;
     line-height: 50px;
-    padding:0 16px;
+    padding: 0 16px;
   }
-  .main{
+  .main {
     // height: calc(100vh - 100px);
     overflow-y: scroll;
   }
