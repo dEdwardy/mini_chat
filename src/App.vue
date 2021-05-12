@@ -35,7 +35,7 @@ export default {
     window.addEventListener('beforeunload', this.handleUnload)
     const username = localStorage.getItem('username')
     const prod = 'http://47.112.172.255:3000'
-    const dev = 'http://localhost:3000'
+    const dev = 'http://192.168.0.127:3000'
     const production = process.env.production
     this.socket = io.connect(production ? prod : dev, {
       transports: ['websocket'],
