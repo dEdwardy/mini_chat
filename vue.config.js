@@ -1,5 +1,5 @@
 module.exports = {
-  publicPath: '/',
+  publicPath: '/mini_chat',
   devServer: {
     port: 80
   }
