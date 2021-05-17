@@ -57,8 +57,16 @@
             {{ item.msg }}
           </div>
           <!-- 语音消息 -->
-          <div style="margin-top:12px" v-else-if="item.type == 'audio'">
-            <m-audio v-if="item.src" :showDuration="false" :block="false" :src="item.src"></m-audio>
+          <div
+            style="margin-top:12px"
+            v-else-if="item.type == 'audio'"
+          >
+            <m-audio
+              v-if="item.src"
+              :showDuration="false"
+              :block="false"
+              :src="item.src"
+            ></m-audio>
           </div>
         </div>
       </div>
@@ -118,21 +126,22 @@
       v-if="showTools"
       style="height:200px"
     >
-      <vue-record-audio
-        class="audio"
-        mode="hold"
-        @result="onResult"
-      />
+      <!-- <VoiceRecorder @voice-input="handleInput" /> -->
+        <vue-record-audio @result="handleInput" />
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+// import VoiceRecorder from '@/components/VoiceRecorder.vue'
 import avatar from '@/assets/avatar.jpg'
 import Clickoutside from '@/utils/clickoutside'
 export default {
   inject: ['app'],
+  components: {
+    // VoiceRecorder
+  },
   directives: { Clickoutside },
   data () {
     return {
@@ -173,8 +182,8 @@ export default {
     //   console.error(res)
     //   return res
     // },
-    async onResult (blob) {
-      // const arrayBuffer = await this.readBlob(blob)
+    handleInput (blob) {
+      console.error(blob)
       const data = {
         from: this.username,
         to: this.$route.params.id,
@@ -280,6 +289,12 @@ export default {
     line-height: 44px;
   }
   .toolBox {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     position: relative;
     background: #fff;
     transition: all 0.2s linear;
